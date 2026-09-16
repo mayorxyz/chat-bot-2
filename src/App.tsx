@@ -17,6 +17,23 @@ interface Conversation {
 }
 
 const STORAGE_KEY = 'chat-assistant-conversations';
+const SESSION_KEY = 'chatSessionId';
+
+function getOrCreateSessionId(): string {
+  try {
+    const existing = localStorage.getItem(SESSION_KEY);
+    if (existing) return existing;
+  } catch {
+    // ignore access errors
+  }
+  const newId = crypto.randomUUID();
+  try {
+    localStorage.setItem(SESSION_KEY, newId);
+  } catch {
+    // ignore quota errors
+  }
+  return newId;
+}
 
 function loadConversations(): Conversation[] {
   try {
@@ -58,6 +75,7 @@ export default function App() {
     }
     return false;
   });
+  const [sessionId, setSessionId] = useState<string>(() => getOrCreateSessionId());
 
   // Persist conversations to localStorage
   useEffect(() => {
@@ -110,7 +128,7 @@ export default function App() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, sessionId }),
       });
 
       if (!response.ok) {
@@ -146,10 +164,18 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeId]);
+  }, [activeId, sessionId]);
 
   const handleNewChat = useCallback(() => {
     setActiveId(null);
+    // Generate a fresh session ID so the backend starts with clean context
+    const freshId = crypto.randomUUID();
+    try {
+      localStorage.setItem(SESSION_KEY, freshId);
+    } catch {
+      // ignore quota errors
+    }
+    setSessionId(freshId);
   }, []);
 
   const handleSelectConversation = useCallback((id: string) => {
