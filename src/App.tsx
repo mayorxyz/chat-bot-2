@@ -18,6 +18,45 @@ interface Conversation {
 
 const STORAGE_KEY = 'chat-assistant-conversations';
 const SESSION_KEY = 'chatSessionId';
+const MESSAGES_KEY = 'chatMessages';
+const ACTIVE_ID_KEY = 'chatActiveId';
+
+function loadActiveId(): string | null {
+  try {
+    return localStorage.getItem(ACTIVE_ID_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function saveMessages(messages: Message[]) {
+  try {
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+  } catch {
+    // ignore quota errors
+  }
+}
+
+function saveActiveId(id: string | null) {
+  try {
+    if (id) {
+      localStorage.setItem(ACTIVE_ID_KEY, id);
+    } else {
+      localStorage.removeItem(ACTIVE_ID_KEY);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+function clearChatMessages() {
+  try {
+    localStorage.removeItem(MESSAGES_KEY);
+    localStorage.removeItem(ACTIVE_ID_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 function getOrCreateSessionId(): string {
   try {
@@ -67,7 +106,7 @@ function generateTitle(firstMessage: string): string {
 
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>(loadConversations);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(() => loadActiveId());
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -82,6 +121,11 @@ export default function App() {
     saveConversations(conversations);
   }, [conversations]);
 
+  // Persist active conversation ID to localStorage
+  useEffect(() => {
+    saveActiveId(activeId);
+  }, [activeId]);
+
   // Auto-open sidebar on desktop resize
   useEffect(() => {
     const handleResize = () => {
@@ -95,6 +139,11 @@ export default function App() {
 
   const activeConversation = conversations.find(c => c.id === activeId);
   const messages = activeConversation?.messages || [];
+
+  // Persist visible messages to localStorage
+  useEffect(() => {
+    saveMessages(messages);
+  }, [messages]);
 
   const handleSend = useCallback(async (message: string) => {
     const userMessage: Message = { role: 'user', content: message };
@@ -168,6 +217,8 @@ export default function App() {
 
   const handleNewChat = useCallback(() => {
     setActiveId(null);
+    // Clear persisted messages so refresh shows empty state
+    clearChatMessages();
     // Generate a fresh session ID so the backend starts with clean context
     const freshId = crypto.randomUUID();
     try {
