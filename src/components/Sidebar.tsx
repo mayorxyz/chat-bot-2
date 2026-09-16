@@ -47,18 +47,18 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
+          className="fixed inset-0 bg-black/20 z-40"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar panel */}
       <aside
-        className={`fixed md:relative top-0 left-0 h-full z-50 md:z-auto w-[280px] sm:w-[300px] bg-cream-dark/70 border-r border-border-light flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed top-0 left-0 h-full z-50 w-[280px] sm:w-[300px] bg-cream-dark/70 border-r border-border-light flex flex-col transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Sidebar header */}
@@ -68,8 +68,9 @@ export default function Sidebar({
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-cream-dark transition-colors text-warm-muted hover:text-warm-text md:hidden"
+            className="p-1.5 rounded-lg hover:bg-cream-dark transition-colors text-warm-muted hover:text-warm-text"
             aria-label="Close sidebar"
+            title="Close sidebar"
           >
             <X size={18} />
           </button>

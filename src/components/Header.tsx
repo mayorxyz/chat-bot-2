@@ -1,21 +1,22 @@
-import { MessageSquarePlus, Menu } from 'lucide-react';
+import { MessageSquarePlus, PanelLeftOpen, PanelLeftClose } from 'lucide-react';
 
 interface HeaderProps {
   onNewChat: () => void;
   onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
 }
 
-export default function Header({ onNewChat, onToggleSidebar }: HeaderProps) {
+export default function Header({ onNewChat, onToggleSidebar, isSidebarOpen }: HeaderProps) {
   return (
     <header className="flex items-center justify-between px-3 sm:px-6 py-3 border-b border-border-light bg-cream/80 backdrop-blur-sm sticky top-0 z-30">
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleSidebar}
           className="p-2.5 rounded-xl hover:bg-cream-dark transition-colors text-warm-muted hover:text-warm-text"
-          aria-label="Toggle sidebar"
-          title="Chat history"
+          aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          title={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
         >
-          <Menu size={20} />
+          {isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
         </button>
         <div className="w-7 h-7 rounded-full bg-terracotta flex items-center justify-center">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
