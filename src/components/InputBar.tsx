@@ -24,6 +24,8 @@ export default function InputBar({ onSend, isLoading }: InputBarProps) {
       setInput('');
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
+        // Keep focus on the textarea after sending
+        textareaRef.current.focus();
       }
     }
   };

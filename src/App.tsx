@@ -260,7 +260,7 @@ export default function App() {
         onDelete={handleDeleteConversation}
       />
       <div className="flex-1 flex flex-col min-w-0">
-        <Header onNewChat={handleNewChat} onToggleSidebar={handleToggleSidebar} />
+        <Header onNewChat={handleNewChat} onToggleSidebar={handleToggleSidebar} isSidebarOpen={sidebarOpen} />
         <ChatWindow messages={messages} isLoading={isLoading} />
         <InputBar onSend={handleSend} isLoading={isLoading} />
       </div>
